@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AnimatePresence, motion } from "framer-motion";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TheoryContent } from "./TheoryContent";
 import { SimulationPanel } from "@/components/physics/SimulationPanel";
 import { QuizPanel } from "@/components/quiz/QuizPanel";
@@ -30,33 +32,53 @@ export function TopicTabs({
   initialProgress,
 }: TopicTabsProps) {
   const t = useTranslations("topics");
+  const [activeTab, setActiveTab] = useState("theory");
 
   return (
-    <Tabs defaultValue="theory">
-      <TabsList className="mb-6">
-        <TabsTrigger value="theory">📖 {t("theory")}</TabsTrigger>
-        <TabsTrigger value="simulation">🔬 {t("simulation")}</TabsTrigger>
-        <TabsTrigger value="quiz">❓ {t("quiz")}</TabsTrigger>
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <TabsList className="mb-6 p-1 h-auto gap-1 bg-transparent border border-border/60 backdrop-blur-sm rounded-[calc(var(--radius)+0.25rem)]">
+        <TabsTrigger
+          value="theory"
+          className="rounded-[calc(var(--radius)-0.125rem)] px-4 py-2.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-[0_1px_3px_rgba(0,0,0,0.08),inset_0_1px_0_hsl(211_100%_65%/0.06)] data-[state=inactive]:text-muted-foreground transition-all duration-200"
+        >
+          📖 {t("theory")}
+        </TabsTrigger>
+        <TabsTrigger
+          value="simulation"
+          className="rounded-[calc(var(--radius)-0.125rem)] px-4 py-2.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-[0_1px_3px_rgba(0,0,0,0.08),inset_0_1px_0_hsl(211_100%_65%/0.06)] data-[state=inactive]:text-muted-foreground transition-all duration-200"
+        >
+          🔬 {t("simulation")}
+        </TabsTrigger>
+        <TabsTrigger
+          value="quiz"
+          className="rounded-[calc(var(--radius)-0.125rem)] px-4 py-2.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-[0_1px_3px_rgba(0,0,0,0.08),inset_0_1px_0_hsl(211_100%_65%/0.06)] data-[state=inactive]:text-muted-foreground transition-all duration-200"
+        >
+          ❓ {t("quiz")}
+        </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="theory">
-        <TheoryContent content={theory} />
-      </TabsContent>
-
-      <TabsContent value="simulation">
-        <SimulationPanel type={simulationType} locale={locale} />
-      </TabsContent>
-
-      <TabsContent value="quiz">
-        <QuizPanel
-          questions={quiz}
-          locale={locale}
-          slug={slug}
-          userId={userId}
-          initialScore={initialProgress?.quizScore ?? null}
-          initialCompleted={initialProgress?.completed ?? false}
-        />
-      </TabsContent>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+        >
+          {activeTab === "theory" && <TheoryContent content={theory} />}
+          {activeTab === "simulation" && <SimulationPanel type={simulationType} locale={locale} />}
+          {activeTab === "quiz" && (
+            <QuizPanel
+              questions={quiz}
+              locale={locale}
+              slug={slug}
+              userId={userId}
+              initialScore={initialProgress?.quizScore ?? null}
+              initialCompleted={initialProgress?.completed ?? false}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </Tabs>
   );
 }

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "./providers/theme-provider";
+import { useEffect, useRef } from "react";
 import {
   Home,
   User,
@@ -29,6 +30,15 @@ export function Sidebar({ locale }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { theme, toggleTheme } = useTheme();
+  const logoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = logoRef.current;
+    if (!el) return;
+    el.classList.add("logo-halo");
+    const t = setTimeout(() => el.classList.remove("logo-halo"), 1400);
+    return () => clearTimeout(t);
+  }, []);
 
   const isActive = (path: string) => pathname === path;
   const navLink = (path: string) => `/${locale}${path}`;
@@ -52,11 +62,14 @@ export function Sidebar({ locale }: SidebarProps) {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[260px] bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800 flex flex-col z-40">
+    <aside className="sidebar-surface fixed left-0 top-0 h-screen w-[260px] flex flex-col z-40">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-gray-100 dark:border-gray-800">
+      <div className="px-5 py-5 border-b border-border/50">
         <Link href={navLink("")} className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+          <div
+            ref={logoRef}
+            className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center flex-shrink-0"
+          >
             <Atom className="w-4 h-4 text-white dark:text-gray-900" />
           </div>
           <div className="min-w-0">
@@ -79,7 +92,7 @@ export function Sidebar({ locale }: SidebarProps) {
               return (
                 <li key={href + label} className="relative">
                   <motion.span
-                    className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
+                    className="absolute inset-0 rounded-xl sidebar-active-pill"
                     initial={false}
                     animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.95 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -88,7 +101,7 @@ export function Sidebar({ locale }: SidebarProps) {
                     href={href}
                     className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                       active
-                        ? "text-white dark:text-gray-900"
+                        ? "text-white"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
@@ -112,7 +125,7 @@ export function Sidebar({ locale }: SidebarProps) {
               return (
                 <li key={label} className="relative">
                   <motion.span
-                    className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
+                    className="absolute inset-0 rounded-xl sidebar-active-pill"
                     initial={false}
                     animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.95 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -121,7 +134,7 @@ export function Sidebar({ locale }: SidebarProps) {
                     href={href}
                     className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                       active
-                        ? "text-white dark:text-gray-900"
+                        ? "text-white"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
@@ -150,7 +163,7 @@ export function Sidebar({ locale }: SidebarProps) {
               return (
                 <li key={label} className="relative">
                   <motion.span
-                    className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
+                    className="absolute inset-0 rounded-xl sidebar-active-pill"
                     initial={false}
                     animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.95 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -159,7 +172,7 @@ export function Sidebar({ locale }: SidebarProps) {
                     href={href}
                     className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                       active
-                        ? "text-white dark:text-gray-900"
+                        ? "text-white"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
@@ -179,8 +192,7 @@ export function Sidebar({ locale }: SidebarProps) {
       </nav>
 
       {/* User area */}
-      <div className="px-3 py-4 border-t border-gray-100 dark:border-gray-800 space-y-1">
-        {/* Theme toggle */}
+      <div className="px-3 py-4 border-t border-border/50 space-y-1">
         <button
           onClick={(e) => toggleTheme(e)}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -215,7 +227,13 @@ export function Sidebar({ locale }: SidebarProps) {
         {session?.user ? (
           <>
             <div className="flex items-center gap-2.5 px-3 py-2">
-              <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+                style={{
+                  background: "linear-gradient(135deg, hsl(211 100% 52%), hsl(204 90% 62%))",
+                  boxShadow: "0 0 0 2px hsl(var(--background)), 0 0 0 3px hsl(211 100% 55% / 0.25)",
+                }}
+              >
                 {(session.user.name ?? session.user.email ?? "?")[0].toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">

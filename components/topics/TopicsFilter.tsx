@@ -22,28 +22,29 @@ export function TopicsFilter({ locale, activeCategory }: TopicsFilterProps) {
   ];
 
   const navigate = (cat: string) => {
-    const url = cat
-      ? `/${locale}/topics?category=${cat}`
-      : `/${locale}/topics`;
+    const url = cat ? `/${locale}/topics?category=${cat}` : `/${locale}/topics`;
     router.push(url);
   };
 
   return (
     <div className="flex flex-wrap gap-2">
-      {categories.map((cat) => (
-        <button
-          key={cat.id}
-          onClick={() => navigate(cat.id)}
-          className={cn(
-            "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
-            activeCategory === cat.id || (!activeCategory && cat.id === "")
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-background text-muted-foreground border-border hover:bg-accent hover:text-foreground"
-          )}
-        >
-          {cat.label}
-        </button>
-      ))}
+      {categories.map((cat) => {
+        const active = activeCategory === cat.id || (!activeCategory && cat.id === "");
+        return (
+          <button
+            key={cat.id}
+            onClick={() => navigate(cat.id)}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border",
+              active
+                ? "filter-pill-active border-transparent"
+                : "bg-background text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+            )}
+          >
+            {cat.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

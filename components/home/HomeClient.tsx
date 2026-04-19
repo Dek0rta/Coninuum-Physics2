@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -13,7 +13,7 @@ import {
   Trophy,
   Zap,
 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 
 function useCountUp(target: number, duration = 1000, delay = 0) {
   const [value, setValue] = useState(0)
@@ -23,7 +23,9 @@ function useCountUp(target: number, duration = 1000, delay = 0) {
       const start = Date.now()
       const tick = () => {
         const progress = Math.min((Date.now() - start) / duration, 1)
-        const eased = 1 - Math.pow(1 - progress, 3)
+        const eased = progress < 1
+          ? 1 - Math.pow(1 - progress, 4) * Math.cos(progress * Math.PI * 2.5)
+          : 1
         setValue(Math.round(eased * target))
         if (progress < 1) requestAnimationFrame(tick)
       }
@@ -39,11 +41,28 @@ function useCountUp(target: number, duration = 1000, delay = 0) {
 function ProgressLine({ value, tone = 'primary' }: { value: number; tone?: 'primary' | 'emerald' }) {
   return (
     <div className="h-2 rounded-full bg-muted">
-      <div
+      <motion.div
         className={tone === 'emerald' ? 'h-2 rounded-full bg-emerald-500' : 'h-2 rounded-full bg-primary'}
-        style={{ width: `${Math.min(Math.max(value, 0), 100)}%`, transition: 'width 360ms cubic-bezier(0.23, 1, 0.32, 1)' }}
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.min(Math.max(value, 0), 100)}%` }}
+        transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1], delay: 0.3 }}
       />
     </div>
+  )
+}
+
+function ChartBar({ height, isToday, index }: { height: number; isToday: boolean; index: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+  return (
+    <motion.div
+      ref={ref}
+      className={isToday ? 'w-full rounded-[0.9rem] bg-primary' : 'w-full rounded-[0.9rem] bg-foreground/[0.18]'}
+      style={{ height: `${height}%`, transformOrigin: 'bottom' }}
+      initial={{ scaleY: 0 }}
+      animate={inView ? { scaleY: 1 } : { scaleY: 0 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 20, mass: 0.8, delay: index * 0.04 }}
+    />
   )
 }
 
@@ -79,9 +98,9 @@ export function HomeClient({ userName, stats, last7Days, categoryProgress, leade
   const hour = new Date().getHours()
   const greeting = hour < 6 ? 'Доброй ночи' : hour < 12 ? 'Доброе утро' : hour < 18 ? 'Добрый день' : 'Добрый вечер'
 
-  const totalMMR = useCountUp(stats.mmr, 1100, 40)
-  const streak = useCountUp(stats.streak, 900, 80)
-  const accuracy = useCountUp(stats.accuracy, 900, 120)
+  const totalMMR = useCountUp(stats.mmr, 1400, 40)
+  const streak = useCountUp(stats.streak, 1000, 80)
+  const accuracy = useCountUp(stats.accuracy, 1000, 120)
   const solvedToday = useCountUp(stats.today_count, 900, 160)
 
   const dailyGoal = stats.daily_goal
@@ -108,7 +127,8 @@ export function HomeClient({ userName, stats, last7Days, categoryProgress, leade
   return (
     <div className="page-shell py-5 sm:py-8">
       {/* Hero card */}
-      <section className="surface-strong overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
+      <section className="surface-strong overflow-hidden relative px-6 py-7 sm:px-8 sm:py-8">
+        <div aria-hidden="true" className="shimmer-hero" />
         <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr] xl:items-end">
           <div>
             <div className="metric-pill w-fit text-muted-foreground">
@@ -135,7 +155,14 @@ export function HomeClient({ userName, stats, last7Days, categoryProgress, leade
                     <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{item.label}</span>
                     <item.icon className="h-4 w-4 text-primary" />
                   </div>
-                  <p className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-foreground">{item.value}</p>
+                  <motion.p
+                    initial={{ scale: 0.92, opacity: 0.7 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                    className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-foreground"
+                  >
+                    {item.value}
+                  </motion.p>
                 </motion.div>
               ))}
             </div>
@@ -244,10 +271,7 @@ export function HomeClient({ userName, stats, last7Days, categoryProgress, leade
                 return (
                   <div key={`day-${index}`} className="flex flex-col items-center gap-3">
                     <div className="flex h-40 w-full items-end rounded-[1.2rem] bg-muted p-2">
-                      <div
-                        className={isToday ? 'w-full rounded-[0.9rem] bg-primary' : 'w-full rounded-[0.9rem] bg-foreground/[0.18]'}
-                        style={{ height: `${height}%`, transition: 'height 360ms cubic-bezier(0.23, 1, 0.32, 1)' }}
-                      />
+                      <ChartBar height={height} isToday={isToday} index={index} />
                     </div>
                     <div className="text-center">
                       <p className={`text-xs font-medium ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -286,9 +310,11 @@ export function HomeClient({ userName, stats, last7Days, categoryProgress, leade
                 leaderboard.map((entry) => (
                   <div
                     key={entry.rank}
-                    className={`flex items-center gap-4 rounded-[1.35rem] px-4 py-4 ${
-                      entry.isMe ? 'bg-foreground text-background' : 'surface-subtle'
-                    }`}
+                    className={`flex items-center gap-4 rounded-[1.35rem] px-4 py-4 ${entry.isMe ? 'text-background' : 'surface-subtle'}`}
+                    style={entry.isMe ? {
+                      background: 'linear-gradient(135deg, hsl(var(--foreground)), hsl(220 20% 28%))',
+                      boxShadow: 'inset 0 1px 0 hsl(0 0% 100% / 0.07)',
+                    } : undefined}
                   >
                     <div
                       className={`flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-semibold ${
