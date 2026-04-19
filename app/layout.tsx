@@ -17,6 +17,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}` }} />
         <script
           id="mathjax-config"
           dangerouslySetInnerHTML={{

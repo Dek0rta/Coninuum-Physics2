@@ -80,7 +80,7 @@ export function Sidebar({ locale }: SidebarProps) {
                 <li key={href + label} className="relative">
                   {active && (
                     <motion.span
-                      layoutId="sidebar-active-pill"
+                      layoutId="pill-overview"
                       className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
@@ -109,12 +109,12 @@ export function Sidebar({ locale }: SidebarProps) {
           </div>
           <ul className="space-y-0.5">
             {practiceItems.map(({ href, label, icon: Icon, badge, badgeColor }) => {
-              const active = isActive(href) && label === "Тренировки";
+              const active = isActive(href);
               return (
                 <li key={label} className="relative">
                   {active && (
                     <motion.span
-                      layoutId="sidebar-active-pill"
+                      layoutId="pill-practice"
                       className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
@@ -153,7 +153,7 @@ export function Sidebar({ locale }: SidebarProps) {
                 <li key={label} className="relative">
                   {active && (
                     <motion.span
-                      layoutId="sidebar-active-pill"
+                      layoutId="pill-growth"
                       className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
