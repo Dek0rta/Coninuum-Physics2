@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/lib/i18n-routing";
 import { Providers } from "@/components/providers";
 import { auth } from "@/lib/auth";
-import { Navbar } from "@/components/layout/Navbar";
+import { Sidebar } from "@/components/Sidebar";
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -24,9 +24,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
       <Providers session={session}>
-        <div className="min-h-screen flex flex-col">
-          <Navbar locale={locale} />
-          <main className="flex-1">{children}</main>
+        <div className="flex min-h-screen bg-gray-50">
+          <Sidebar locale={locale} />
+          <main className="flex-1 ml-[230px] min-h-screen">
+            {children}
+          </main>
         </div>
       </Providers>
     </NextIntlClientProvider>

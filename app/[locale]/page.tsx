@@ -1,204 +1,315 @@
-import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { ArrowRight, Atom, Zap, Thermometer, Binary, BookOpen, Play, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CATEGORIES } from "@/lib/topics-data";
+import { auth } from "@/lib/auth";
+import { TOPICS, CATEGORIES } from "@/lib/topics-data";
+import {
+  Zap,
+  BookOpen,
+  Layers,
+  Bot,
+  Target,
+  Flame,
+  TrendingUp,
+  CheckCircle2,
+  Crown,
+  Trophy,
+} from "lucide-react";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export default async function HomePage({ params }: PageProps) {
+interface DashboardData {
+  stats: {
+    mmr: number;
+    streak: number;
+    accuracy: number;
+    today_count: number;
+    daily_goal: number;
+  };
+  weekly_activity: { day: string; count: number }[];
+  leaderboard: { rank: number; name: string; score: number; isMe: boolean }[];
+  topic_progress: {
+    slug: string;
+    category: string;
+    titleRu: string;
+    quizScore: number;
+    completed: boolean;
+  }[];
+}
+
+async function getDashboardData(baseUrl: string): Promise<DashboardData> {
+  try {
+    const res = await fetch(`${baseUrl}/api/dashboard`, {
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error("fetch failed");
+    return res.json();
+  } catch {
+    return {
+      stats: { mmr: 0, streak: 0, accuracy: 0, today_count: 0, daily_goal: 10 },
+      weekly_activity: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((day) => ({
+        day,
+        count: 0,
+      })),
+      leaderboard: [],
+      topic_progress: [],
+    };
+  }
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return "Доброй ночи";
+  if (h < 12) return "Доброе утро";
+  if (h < 18) return "Добрый день";
+  return "Добрый вечер";
+}
+
+export default async function DashboardPage({ params }: PageProps) {
   const { locale } = await params;
-  const t = await getTranslations("home");
-  const tTopics = await getTranslations("topics");
+  const session = await auth();
 
-  const categoryIcons = {
-    mechanics: Atom,
-    em: Zap,
-    thermo: Thermometer,
-    quantum: Binary,
-  };
+  // Build base URL for internal API call
+  const baseUrl =
+    process.env.NEXTAUTH_URL ??
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
 
-  const categoryColors = {
-    mechanics: "from-blue-500/20 to-blue-600/5",
-    em: "from-yellow-500/20 to-yellow-600/5",
-    thermo: "from-red-500/20 to-red-600/5",
-    quantum: "from-purple-500/20 to-purple-600/5",
-  };
+  const data = await getDashboardData(baseUrl);
+
+  const { stats, weekly_activity, leaderboard, topic_progress } = data;
+
+  // Build category progress
+  const categoryProgress = CATEGORIES.map((cat) => {
+    const catTopics = TOPICS.filter((t) => t.category === cat.id);
+    const completed = topic_progress.filter(
+      (p) => p.category === cat.id && p.completed
+    ).length;
+    const pct = catTopics.length > 0 ? Math.round((completed / catTopics.length) * 100) : 0;
+    return {
+      id: cat.id,
+      label: locale === "ru" ? cat.labelRu : cat.labelEn,
+      icon: cat.icon,
+      completed,
+      total: catTopics.length,
+      pct,
+    };
+  });
+
+  const dailyPct = Math.min(
+    100,
+    Math.round((stats.today_count / stats.daily_goal) * 100)
+  );
+
+  const maxActivity = Math.max(...weekly_activity.map((d) => d.count), 1);
+
+  const userName =
+    session?.user?.name ?? session?.user?.email?.split("@")[0] ?? null;
 
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-apple-gray to-background dark:from-zinc-900 dark:to-background">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
-            <Star className="h-3.5 w-3.5" />
-            Continuum Physics
-          </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6">
-            {t("hero_title").split("").map((char, i) =>
-              char === "—" ? (
-                <span key={i} className="gradient-text">
-                  {" "}
-                  {char}{" "}
-                </span>
+    <div className="p-6 max-w-[1100px] mx-auto">
+      {/* TOP HERO CARD */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-5">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+          {/* Left: greeting + stats */}
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-medium mb-3">
+              ✨ {getGreeting()}
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              {userName ? (
+                <>
+                  Привет, {userName}
+                  {stats.mmr >= 100 && (
+                    <Crown className="inline w-5 h-5 text-amber-400 ml-1.5 -mt-0.5" />
+                  )}
+                </>
               ) : (
-                char
-              )
-            )}
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t("hero_subtitle")}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" className="rounded-full px-8 text-base">
-              <Link href={`/${locale}/topics`}>
-                {t("hero_cta")}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-full px-8 text-base"
-            >
-              <Link href={`/${locale}/topics`}>{t("hero_cta_secondary")}</Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Decorative physics formula */}
-        <div className="absolute top-12 left-8 text-6xl font-light text-foreground/5 select-none hidden lg:block">
-          E = mc²
-        </div>
-        <div className="absolute bottom-12 right-8 text-5xl font-light text-foreground/5 select-none hidden lg:block">
-          F = ma
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-24 bg-background">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("features_title")}</h2>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              {t("features_subtitle")}
+                "Добро пожаловать"
+              )}
+            </h1>
+            <p className="text-gray-400 text-sm mb-5">
+              Продолжай учиться — каждый день на шаг ближе к мастерству
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {CATEGORIES.map((cat) => {
-              const Icon = categoryIcons[cat.id as keyof typeof categoryIcons];
-              const gradient = categoryColors[cat.id as keyof typeof categoryColors];
-              const label = locale === "ru" ? cat.labelRu : cat.labelEn;
-              const topicCount = cat.topics.length;
-
-              return (
-                <Link key={cat.id} href={`/${locale}/topics?category=${cat.id}`}>
-                  <Card className={`group cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br ${gradient} border-0`}>
-                    <CardHeader>
-                      <div className="text-3xl mb-3">{cat.icon}</div>
-                      <CardTitle className="text-lg">{label}</CardTitle>
-                      <CardDescription>
-                        {topicCount} {locale === "ru" ? "тем" : "topics"}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {cat.topics.slice(0, 3).map((topic) => (
-                          <li key={topic.slug} className="text-sm text-muted-foreground flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 rounded-full bg-current opacity-50" />
-                            {locale === "ru" ? topic.titleRu : topic.titleEn}
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-24 bg-apple-gray dark:bg-zinc-900/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {locale === "ru" ? "Как это работает" : "How it works"}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: BookOpen,
-                titleRu: "1. Теория",
-                titleEn: "1. Theory",
-                descRu: "Читайте объяснения с формулами LaTeX",
-                descEn: "Read explanations with LaTeX formulas",
-              },
-              {
-                icon: Play,
-                titleRu: "2. Симуляция",
-                titleEn: "2. Simulation",
-                descRu: "Управляйте параметрами и наблюдайте результат",
-                descEn: "Adjust parameters and observe results",
-              },
-              {
-                icon: Star,
-                titleRu: "3. Квиз",
-                titleEn: "3. Quiz",
-                descRu: "Проверьте знания и сохраните прогресс",
-                descEn: "Test your knowledge and save progress",
-              },
-            ].map((step) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.titleEn} className="text-center">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4">
-                    <Icon className="h-7 w-7" />
+            {/* Stats row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[
+                {
+                  icon: Trophy,
+                  value: stats.mmr,
+                  label: "MMR",
+                  color: "text-amber-500",
+                },
+                {
+                  icon: Flame,
+                  value: stats.streak,
+                  label: "Серия",
+                  color: "text-orange-500",
+                },
+                {
+                  icon: TrendingUp,
+                  value: `${stats.accuracy}%`,
+                  label: "Точность",
+                  color: "text-blue-500",
+                },
+                {
+                  icon: CheckCircle2,
+                  value: stats.today_count,
+                  label: "Сегодня",
+                  color: "text-green-500",
+                },
+              ].map(({ icon: Icon, value, label, color }) => (
+                <div key={label} className="flex items-center gap-3">
+                  <div className={`${color}`}>
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    {locale === "ru" ? step.titleRu : step.titleEn}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {locale === "ru" ? step.descRu : step.descEn}
-                  </p>
+                  <div>
+                    <div className="text-lg font-bold text-gray-900 leading-tight">
+                      {value}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-400">
+                      {label}
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          {/* Right: daily goal + quick actions */}
+          <div className="lg:w-[220px] flex flex-col gap-4">
+            {/* Daily goal */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-gray-700">Дневная цель</span>
+              </div>
+              <div className="text-xs text-gray-400 mb-2">
+                {stats.today_count} из {stats.daily_goal} заданий
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                <div
+                  className="bg-blue-600 h-1.5 rounded-full transition-all"
+                  style={{ width: `${dailyPct}%` }}
+                />
+              </div>
+              <div className="text-right text-xs text-gray-400 mt-1">{dailyPct}%</div>
+            </div>
+
+            {/* Quick actions */}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { icon: Zap, label: "Трен-ки", href: `/${locale}/topics` },
+                { icon: BookOpen, label: "Теория", href: `/${locale}/topics` },
+                { icon: Layers, label: "Карточки", href: `/${locale}/topics` },
+                { icon: Bot, label: "AI репетитор", href: "#" },
+              ].map(({ icon: Icon, label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="flex flex-col items-center gap-1.5 p-3 border border-gray-200 rounded-xl text-center text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                >
+                  <Icon className="w-4 h-4 text-gray-500" />
+                  {label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* CTA */}
-      <section className="py-24 bg-primary text-primary-foreground">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("cta_title")}</h2>
-          <p className="text-xl opacity-80 mb-10">{t("cta_subtitle")}</p>
-          <Button
-            asChild
-            size="lg"
-            variant="secondary"
-            className="rounded-full px-10 text-base"
-          >
-            <Link href={`/${locale}/auth/register`}>{t("cta_button")}</Link>
-          </Button>
+      {/* BOTTOM ROW */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Topic progress — 2 cols wide */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-semibold text-gray-900">Прогресс по темам</h2>
+            <Link
+              href={`/${locale}/topics`}
+              className="text-xs text-blue-600 hover:underline"
+            >
+              Открыть темы →
+            </Link>
+          </div>
+          <div className="space-y-4">
+            {categoryProgress.map((cat) => (
+              <div key={cat.id}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="flex items-center gap-2 text-sm text-gray-700">
+                    <span>{cat.icon}</span>
+                    {cat.label}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {cat.completed}/{cat.total}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <div
+                    className="bg-blue-600 h-1.5 rounded-full transition-all"
+                    style={{ width: `${cat.pct}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
+
+        {/* Right column */}
+        <div className="flex flex-col gap-5">
+          {/* Weekly rhythm */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <h2 className="font-semibold text-gray-900 mb-4">Ритм недели</h2>
+            <div className="flex items-end gap-1.5 h-16">
+              {weekly_activity.map(({ day, count }) => {
+                const heightPct = Math.round((count / maxActivity) * 100);
+                return (
+                  <div key={day} className="flex-1 flex flex-col items-center gap-1">
+                    <div
+                      className="w-full bg-blue-600 rounded-sm transition-all"
+                      style={{
+                        height: `${Math.max(heightPct, count > 0 ? 10 : 4)}%`,
+                        opacity: count > 0 ? 1 : 0.15,
+                      }}
+                    />
+                    <span className="text-[9px] text-gray-400">{day}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Leaderboard */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 flex-1">
+            <h2 className="font-semibold text-gray-900 mb-4">Топ игроков</h2>
+            {leaderboard.length === 0 ? (
+              <p className="text-xs text-gray-400">Пока нет данных</p>
+            ) : (
+              <ul className="space-y-2">
+                {leaderboard.map((entry) => (
+                  <li
+                    key={entry.rank}
+                    className={`flex items-center gap-2 text-sm ${
+                      entry.isMe ? "font-semibold text-blue-600" : "text-gray-700"
+                    }`}
+                  >
+                    <span className="w-5 text-center text-xs text-gray-400 font-medium">
+                      {entry.rank}
+                    </span>
+                    <span className="flex-1 truncate">{entry.name}</span>
+                    <span className="text-xs text-gray-400">{entry.score}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        <div className="max-w-6xl mx-auto px-4">
-          <p>
-            © {new Date().getFullYear()} Continuum Physics.{" "}
-            {locale === "ru" ? "Все права защищены" : "All rights reserved"}.
-          </p>
-        </div>
+      <footer className="mt-8 text-center text-xs text-gray-400">
+        © {new Date().getFullYear()} Continuum Physics
       </footer>
     </div>
   );
