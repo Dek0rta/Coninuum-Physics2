@@ -28,23 +28,32 @@ export function RegisterForm({ locale }: RegisterFormProps) {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? (locale === "ru" ? "Ошибка регистрации" : "Registration error"));
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? (locale === "ru" ? "Ошибка регистрации" : "Registration error"));
+        return;
+      }
+
+      // Auto-login — if it fails, redirect to login page
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) {
+        router.push(`/${locale}/auth/login`);
+        return;
+      }
+      router.push(`/${locale}/home`);
+      router.refresh();
+    } catch {
+      setError(locale === "ru" ? "Ошибка сети. Попробуйте снова." : "Network error. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Auto-login
-    await signIn("credentials", { email, password, redirect: false });
-    router.push(`/${locale}/home`);
-    router.refresh();
   };
 
   return (

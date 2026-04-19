@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Onest } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"] });
+const onest = Onest({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
   title: "Continuum Physics — Interactive Learning",
@@ -38,7 +38,7 @@ export default function RootLayout({
           async
         />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={onest.className}>{children}</body>
     </html>
   );
 }

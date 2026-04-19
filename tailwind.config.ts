@@ -54,8 +54,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
-          "Inter",
-          "SF Pro Display",
+          "Onest",
           "system-ui",
           "-apple-system",
           "sans-serif",
