@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { TOPICS, CATEGORIES } from "@/lib/topics-data";
 import { HomeClient } from "@/components/home/HomeClient";
+import { LandingPage } from "@/components/landing/LandingPage";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -45,9 +46,14 @@ async function getDashboardData(baseUrl: string): Promise<DashboardData> {
   }
 }
 
-export default async function DashboardPage({ params }: PageProps) {
+export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
   const session = await auth();
+
+  // Unauthenticated → landing page
+  if (!session?.user) {
+    return <LandingPage locale={locale} />;
+  }
 
   const baseUrl =
     process.env.NEXTAUTH_URL ??
