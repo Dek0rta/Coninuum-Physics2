@@ -1,0 +1,101 @@
+{
+  "nav": {
+    "home": "Главная",
+    "topics": "Темы",
+    "profile": "Профиль",
+    "login": "Войти",
+    "logout": "Выйти",
+    "register": "Регистрация"
+  },
+  "home": {
+    "hero_title": "Физика — это красиво",
+    "hero_subtitle": "Интерактивные симуляции, визуализации и задачи по классической и современной физике",
+    "hero_cta": "Начать изучение",
+    "hero_cta_secondary": "Посмотреть темы",
+    "features_title": "Четыре раздела",
+    "features_subtitle": "От механики до квантовой физики — всё с интерактивными симуляциями",
+    "topics_title": "Популярные темы",
+    "cta_title": "Готовы начать?",
+    "cta_subtitle": "Создайте аккаунт и отслеживайте свой прогресс",
+    "cta_button": "Зарегистрироваться бесплатно"
+  },
+  "topics": {
+    "title": "Темы",
+    "subtitle": "Выберите раздел физики",
+    "all": "Все",
+    "mechanics": "Механика",
+    "em": "Электромагнетизм",
+    "thermo": "Термодинамика",
+    "quantum": "Квантовая физика",
+    "theory": "Теория",
+    "simulation": "Симуляция",
+    "quiz": "Квиз",
+    "start_quiz": "Начать квиз",
+    "completed": "Завершено",
+    "score": "Результат"
+  },
+  "quiz": {
+    "question": "Вопрос",
+    "of": "из",
+    "check": "Проверить",
+    "next": "Следующий",
+    "finish": "Завершить",
+    "correct": "Правильно!",
+    "incorrect": "Неверно",
+    "result": "Результат",
+    "retry": "Попробовать снова",
+    "progress_saved": "Прогресс сохранён"
+  },
+  "auth": {
+    "login_title": "Добро пожаловать",
+    "login_subtitle": "Войдите, чтобы продолжить",
+    "register_title": "Создать аккаунт",
+    "register_subtitle": "Начните изучать физику",
+    "email": "Email",
+    "password": "Пароль",
+    "name": "Имя",
+    "login_button": "Войти",
+    "register_button": "Зарегистрироваться",
+    "google_button": "Продолжить с Google",
+    "no_account": "Нет аккаунта?",
+    "have_account": "Уже есть аккаунт?",
+    "forgot_password": "Забыли пароль?",
+    "sign_up": "Зарегистрироваться",
+    "sign_in": "Войти"
+  },
+  "profile": {
+    "title": "Профиль",
+    "progress": "Прогресс",
+    "completed_topics": "Завершённые темы",
+    "average_score": "Средний балл",
+    "total_time": "Общее время",
+    "recent_activity": "Последняя активность",
+    "no_progress": "Ещё нет завершённых тем"
+  },
+  "simulation": {
+    "start": "Запустить",
+    "stop": "Стоп",
+    "reset": "Сброс",
+    "speed": "Скорость",
+    "angle": "Угол",
+    "gravity": "Ускорение g",
+    "initial_velocity": "Начальная скорость",
+    "temperature": "Температура",
+    "pressure": "Давление",
+    "volume": "Объём",
+    "charge": "Заряд",
+    "mass": "Масса"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "back": "Назад",
+    "next": "Далее",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "open": "Открыть",
+    "dark_mode": "Тёмная тема",
+    "light_mode": "Светлая тема"
+  }
+}

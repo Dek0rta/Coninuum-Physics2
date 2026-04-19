@@ -1,0 +1,101 @@
+{
+  "nav": {
+    "home": "Home",
+    "topics": "Topics",
+    "profile": "Profile",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "register": "Register"
+  },
+  "home": {
+    "hero_title": "Physics is beautiful",
+    "hero_subtitle": "Interactive simulations, visualizations and problems in classical and modern physics",
+    "hero_cta": "Start learning",
+    "hero_cta_secondary": "Browse topics",
+    "features_title": "Four modules",
+    "features_subtitle": "From mechanics to quantum physics — all with interactive simulations",
+    "topics_title": "Featured topics",
+    "cta_title": "Ready to begin?",
+    "cta_subtitle": "Create an account and track your progress",
+    "cta_button": "Sign up for free"
+  },
+  "topics": {
+    "title": "Topics",
+    "subtitle": "Choose a branch of physics",
+    "all": "All",
+    "mechanics": "Mechanics",
+    "em": "Electromagnetism",
+    "thermo": "Thermodynamics",
+    "quantum": "Quantum Physics",
+    "theory": "Theory",
+    "simulation": "Simulation",
+    "quiz": "Quiz",
+    "start_quiz": "Start quiz",
+    "completed": "Completed",
+    "score": "Score"
+  },
+  "quiz": {
+    "question": "Question",
+    "of": "of",
+    "check": "Check",
+    "next": "Next",
+    "finish": "Finish",
+    "correct": "Correct!",
+    "incorrect": "Incorrect",
+    "result": "Result",
+    "retry": "Try again",
+    "progress_saved": "Progress saved"
+  },
+  "auth": {
+    "login_title": "Welcome back",
+    "login_subtitle": "Sign in to continue",
+    "register_title": "Create an account",
+    "register_subtitle": "Start learning physics",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "login_button": "Sign In",
+    "register_button": "Sign Up",
+    "google_button": "Continue with Google",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "forgot_password": "Forgot password?",
+    "sign_up": "Sign up",
+    "sign_in": "Sign in"
+  },
+  "profile": {
+    "title": "Profile",
+    "progress": "Progress",
+    "completed_topics": "Completed topics",
+    "average_score": "Average score",
+    "total_time": "Total time",
+    "recent_activity": "Recent activity",
+    "no_progress": "No completed topics yet"
+  },
+  "simulation": {
+    "start": "Start",
+    "stop": "Stop",
+    "reset": "Reset",
+    "speed": "Speed",
+    "angle": "Angle",
+    "gravity": "Gravity g",
+    "initial_velocity": "Initial velocity",
+    "temperature": "Temperature",
+    "pressure": "Pressure",
+    "volume": "Volume",
+    "charge": "Charge",
+    "mass": "Mass"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "open": "Open",
+    "dark_mode": "Dark mode",
+    "light_mode": "Light mode"
+  }
+}
