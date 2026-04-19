@@ -8,7 +8,7 @@ const intlMiddleware = createMiddleware(routing);
 
 const protectedPaths = ["/profile"];
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Strip locale prefix to check protected paths
