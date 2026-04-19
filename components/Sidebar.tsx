@@ -44,7 +44,7 @@ export function Sidebar({ locale }: SidebarProps) {
   const navLink = (path: string) => `/${locale}${path}`;
 
   const overviewItems = [
-    { href: navLink(""), label: "Главная", icon: Home },
+    { href: navLink("/home"), label: "Главная", icon: Home },
     { href: navLink("/profile"), label: "Кабинет", icon: User },
   ];
 

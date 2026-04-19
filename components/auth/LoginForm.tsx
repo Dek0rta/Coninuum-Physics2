@@ -37,7 +37,7 @@ export function LoginForm({ locale }: LoginFormProps) {
     if (result?.error) {
       setError(locale === "ru" ? "Неверный email или пароль" : "Invalid email or password");
     } else {
-      router.push(`/${locale}`);
+      router.push(`/${locale}/home`);
       router.refresh();
     }
 
@@ -45,7 +45,7 @@ export function LoginForm({ locale }: LoginFormProps) {
   };
 
   const handleGoogle = () => {
-    signIn("google", { callbackUrl: `/${locale}` });
+    signIn("google", { callbackUrl: `/${locale}/home` });
   };
 
   return (

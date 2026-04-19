@@ -43,7 +43,7 @@ export function RegisterForm({ locale }: RegisterFormProps) {
 
     // Auto-login
     await signIn("credentials", { email, password, redirect: false });
-    router.push(`/${locale}`);
+    router.push(`/${locale}/home`);
     router.refresh();
   };
 
