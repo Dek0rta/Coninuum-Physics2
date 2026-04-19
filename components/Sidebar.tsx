@@ -39,9 +39,9 @@ export function Sidebar({ locale }: SidebarProps) {
   ];
 
   const practiceItems = [
-    { href: navLink("/topics"), label: "Тренировки", icon: Zap, badge: null, badgeColor: null },
-    { href: navLink("/topics"), label: "Теория", icon: BookOpen, badge: null, badgeColor: null },
-    { href: navLink("/topics"), label: "Карточки", icon: Layers, badge: "NEW", badgeColor: "bg-amber-500" },
+    { href: navLink("/topics"), activePath: navLink("/topics"), label: "Тренировки", icon: Zap, badge: null, badgeColor: null },
+    { href: navLink("/topics"), activePath: navLink("/topics/theory"), label: "Теория", icon: BookOpen, badge: null, badgeColor: null },
+    { href: navLink("/topics"), activePath: navLink("/topics/cards"), label: "Карточки", icon: Layers, badge: "NEW", badgeColor: "bg-amber-500" },
   ];
 
   const growthItems = [
@@ -52,7 +52,7 @@ export function Sidebar({ locale }: SidebarProps) {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[230px] bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800 flex flex-col z-40">
+    <aside className="fixed left-0 top-0 h-screen w-[260px] bg-white dark:bg-gray-950 border-r border-gray-100 dark:border-gray-800 flex flex-col z-40">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-gray-100 dark:border-gray-800">
         <Link href={navLink("")} className="flex items-center gap-2.5">
@@ -78,13 +78,12 @@ export function Sidebar({ locale }: SidebarProps) {
               const active = isActive(href);
               return (
                 <li key={href + label} className="relative">
-                  {active && (
-                    <motion.span
-                      layoutId="pill-overview"
-                      className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
+                  <motion.span
+                    className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
+                    initial={false}
+                    animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
                   <Link
                     href={href}
                     className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
@@ -108,17 +107,16 @@ export function Sidebar({ locale }: SidebarProps) {
             Практика
           </div>
           <ul className="space-y-0.5">
-            {practiceItems.map(({ href, label, icon: Icon, badge, badgeColor }) => {
-              const active = isActive(href);
+            {practiceItems.map(({ href, label, icon: Icon, badge, badgeColor, activePath }) => {
+              const active = pathname === activePath;
               return (
                 <li key={label} className="relative">
-                  {active && (
-                    <motion.span
-                      layoutId="pill-practice"
-                      className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
+                  <motion.span
+                    className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
+                    initial={false}
+                    animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
                   <Link
                     href={href}
                     className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
@@ -151,13 +149,12 @@ export function Sidebar({ locale }: SidebarProps) {
               const active = isActive(href);
               return (
                 <li key={label} className="relative">
-                  {active && (
-                    <motion.span
-                      layoutId="pill-growth"
-                      className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
+                  <motion.span
+                    className="absolute inset-0 bg-gray-900 dark:bg-white rounded-xl"
+                    initial={false}
+                    animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
                   <Link
                     href={href}
                     className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
