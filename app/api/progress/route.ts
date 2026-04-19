@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-import { z } from "zod";
 
 const schema = z.object({
   slug: z.string(),
@@ -25,8 +24,8 @@ export async function POST(req: NextRequest) {
   }
 
   const { slug, quizScore, completed } = parsed.data;
+  const { prisma } = await import("@/lib/prisma");
 
-  // Upsert topic
   let topic = await prisma.topic.findUnique({ where: { slug } });
   if (!topic) {
     topic = await prisma.topic.create({
@@ -66,6 +65,8 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const { prisma } = await import("@/lib/prisma");
 
   const progress = await prisma.userProgress.findMany({
     where: { userId: session.user.id },

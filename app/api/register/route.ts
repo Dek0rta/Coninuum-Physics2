@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-import { z } from "zod";
 
 const schema = z.object({
   email: z.string().email(),
@@ -21,6 +20,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { email, password, name } = parsed.data;
+  const { prisma } = await import("@/lib/prisma");
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
